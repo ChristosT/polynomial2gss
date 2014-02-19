@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc 
-
+from itertools import product
 
 
 from sympy import Matrix, Poly, symbols, pprint, zeros,sympify
@@ -22,9 +22,13 @@ from PySide import QtCore, QtGui
 import sys
 
 on_example=False  # in order to know if we are going to calculate an example . It helps to fill the matrices
-O=zeros(2,2)
+already_entered_A=False # in order to be able to check your input afterwards ---list maybe?
+already_entered_B=False
+already_entered_C=False
+already_entered_D=False
+#O=zeros(2,2)
 #INPUT=[As,Cs,Bs,Ds]
-OUTPUT=[O,O,O,O,O]
+#OUTPUT=[O,O,O,O,O]
 Names=['E','A','B','C','D']
 class MainWindow(QtGui.QDialog):
     def __init__(self,  parent=None):
@@ -51,7 +55,7 @@ class MainWindow(QtGui.QDialog):
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)
 
-        self.setWindowTitle(self.tr("Title"))
+        self.setWindowTitle(self.tr("polynomial2gss"))
     
              
 class InputTab(QtGui.QWidget):
@@ -217,6 +221,7 @@ class InputTab(QtGui.QWidget):
         
         else:
             msgBox = QtGui.QMessageBox()
+            msgBox.setWindowTitle(self.tr("polynomial2gss"))
             msgBox.setText("<b> Your input doesn't meet the problem requirements <\b>")
             msgBox.exec_()
         
@@ -339,6 +344,7 @@ class OutputTab(QtGui.QWidget):
                 text="<b>Results aren't validated</b>"
             
             msgBox = QtGui.QMessageBox()
+            msgBox.setWindowTitle(self.tr("polynomial2gss"))
             msgBox.setText("Are the results fullfil the Furhmann system-equivalence ? :" )
             msgBox.setInformativeText(text)
             msgBox.exec_()
@@ -360,13 +366,33 @@ class Output_Dialog(QtGui.QDialog):
             for j in range(Data_Matrix.cols):
                 item = QtGui.QTableWidgetItem(str(Data_Matrix[i,j]))
                 self.tableWidget.setItem(i, j, item)
-        
+                
+        ExportButton = QtGui.QPushButton(self.tr("Export"))
+        ExportButton.clicked.connect(self.export)
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(self.tableWidget)
+        mainLayout.addWidget(ExportButton)
         self.setLayout(mainLayout)
         string='Matrix:'+str(Name_of_Matrix)
         self.resize(700,300)
         self.setWindowTitle(self.tr(string))
+    
+    def export(self):
+        #http://stackoverflow.com/questions/1230222/selected-rows-line-in-qtableview-copy-to-qclipboard
+        text=""
+        for i in range(self.tableWidget.rowCount()):
+            text +='\n'
+            for j in range(self.tableWidget.columnCount()):
+                text +=self.tableWidget.item(i,j).text()
+                text +='\t'
+        
+        clipboard = QtGui.QApplication.clipboard()
+        clipboard.setText(text)
+        msgBox = QtGui.QMessageBox()
+        msgBox.setWindowTitle(self.tr("polynomial2gss"))
+        msgBox.setText("The results copied to system's clipboard !" )
+        msgBox.exec_()
+
         
 class Input_Dialog(QtGui.QDialog):
     def __init__(self, Name_of_Matrix, parent=None):
@@ -381,6 +407,17 @@ class Input_Dialog(QtGui.QDialog):
 
         if on_example==True:  # fill matrices with the example values
             self.fill()
+        
+        if self.Name_of_Matrix=='A' and already_entered_A==True:
+            self.fill()
+        if self.Name_of_Matrix=='B' and already_entered_B==True:
+            self.fill()
+        if self.Name_of_Matrix=='C' and already_entered_C==True:
+            self.fill()
+        if self.Name_of_Matrix=='D' and already_entered_D==True:
+            self.fill()
+
+
 
         #Create Buttons 
         AddRowButton = QtGui.QPushButton(self.tr("Add Row"))
@@ -445,17 +482,23 @@ class Input_Dialog(QtGui.QDialog):
         data=[sympify(self.tableWidget.item(i,j).text()) for i,j in  product(range(self.tableWidget.rowCount()), range(self.tableWidget.columnCount()))]
         
         if self.Name_of_Matrix=='A':
-            global As
+            global As,already_entered_A
             As=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data)
+            already_entered_A=True
+            
         elif self.Name_of_Matrix=='B':
-            global Bs
+            global Bs ,already_entered_B
             Bs=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data) 
+            already_entered_B=True
+            
         elif self.Name_of_Matrix=='C':
-            global Cs
+            global Cs,already_entered_C
             Cs=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data) 
+            already_entered_C=True
         else:
-            global Ds
+            global Ds ,already_entered_D
             Ds=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data) 
+            already_entered_D=True
         
         
         self.close()        #close input window
