@@ -11,9 +11,9 @@ Implementation of algorithms shown in http://imamci.oxfordjournals.org/content/1
 - Tan & Vandewall  Equivalent Model (alternative algorithm)
 
 ##Running the program
-- To run the programm download  <a href="https://github.com/ChristosT/polynomial2gss/blob/master/dist.zip">dist.zip</a>
+- To run the program download  <a href="https://www.dropbox.com/s/79tyjsbe1u1k3ev/polynomial2gss.zip">polynomial2gss.zip</a>
 
-dist.zip, extract it and run  launch_GUI.exe 
+extract it and run  launch_GUI.exe 
 
 ## Compiling the code 
 ###Required Packages:
