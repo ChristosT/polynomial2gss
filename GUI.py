@@ -22,14 +22,13 @@ from PySide import QtCore, QtGui
 import sys
 
 on_example=False  # in order to know if we are going to calculate an example . It helps to fill the matrices
-already_entered_A=False # in order to be able to check your input afterwards ---list maybe?
-already_entered_B=False
-already_entered_C=False
-already_entered_D=False
-#O=zeros(2,2)
-#INPUT=[As,Cs,Bs,Ds]
-#OUTPUT=[O,O,O,O,O]
+already_entered={'A':False,'B':False,'C':False,'D':False} # in order to be able to check your input afterwards ---list maybe?
 Names=['E','A','B','C','D']
+As=zeros(2,2)
+Bs=zeros(2,2)
+Cs=zeros(2,2)
+Ds=zeros(2,2)
+
 class MainWindow(QtGui.QDialog):
     def __init__(self,  parent=None):
         super(MainWindow, self).__init__(parent)
@@ -98,8 +97,10 @@ class InputTab(QtGui.QWidget):
         Run = QtGui.QPushButton(self.tr("Run"))
         example1 = QtGui.QPushButton(self.tr("Load example 1"))
         example2 = QtGui.QPushButton(self.tr("Load example 2"))
+        example3 = QtGui.QPushButton(self.tr("Load example 3"))
         example1.setToolTip('After pressing the button check the input Matrices  to see the example \'s input')
         example2.setToolTip('After pressing the button check the input Matrices  to see the example \'s input')
+        example3.setToolTip('After pressing the button check the input Matrices  to see the example \'s input')
         self.checkBox = QtGui.QCheckBox('Include tests')
 
         #Connect Buttons
@@ -110,6 +111,7 @@ class InputTab(QtGui.QWidget):
         Run.clicked.connect(self.onRun)
         example1.clicked.connect(self.example1)
         example2.clicked.connect(self.example2)
+        example3.clicked.connect(self.example3)
         
         """
         grid = QtGui.QGridLayout()
@@ -123,6 +125,9 @@ class InputTab(QtGui.QWidget):
         grid.addWidget(self.radio3, 3,2)
         grid.addWidget(self.radio4, 4,2)
         """
+        #progress_bar #http://srinikom.github.io/pyside-docs/PySide/QtGui/QProgressBar.html
+        self.progressBar = QtGui.QProgressBar()
+        self.progressBar.setRange(0,1)
 
         
         #ButtonsLayout.addWidget(Run)
@@ -139,13 +144,13 @@ class InputTab(QtGui.QWidget):
         LatexGroup.setLayout(LatexLayout)
 
         #add a horizontal line to slit Run button from others
-        horizontalLine =QtGui.QFrame()
-        horizontalLine.setFrameStyle(QtGui.QFrame.HLine)
-        horizontalLine.frameWidth=3
+        #horizontalLine =QtGui.QFrame()
+        #horizontalLine.setFrameStyle(QtGui.QFrame.HLine)
+        #horizontalLine.frameWidth=3
         
-        verticalLine =QtGui.QFrame()
-        verticalLine.setFrameStyle(QtGui.QFrame.VLine)
-        verticalLine.frameWidth=3
+        #verticalLine =QtGui.QFrame()
+        #verticalLine.setFrameStyle(QtGui.QFrame.VLine)
+        #verticalLine.frameWidth=3
         
         #horizontalLine.lineWidth=3
         #horizontalLine.midlineWidth=3
@@ -157,21 +162,23 @@ class InputTab(QtGui.QWidget):
         
         inputLayout = QtGui.QHBoxLayout()
         inputLayout.addWidget(ButtonsGroup)
-        inputLayout.addWidget(verticalLine)
+        #inputLayout.addWidget(verticalLine)
         inputLayout.addWidget(RadioGroup)
         mainLayout.addLayout(inputLayout)
-        mainLayout.addWidget(horizontalLine)
+        #mainLayout.addWidget(horizontalLine)
         
         grid = QtGui.QGridLayout()
         #Create Button Layout
         grid.addWidget(example1, 1,1)
         grid.addWidget(example2, 2,1)
+        grid.addWidget(example3, 3,1)
         #grid.addWidget(MatrixC, 3,1)
         #grid.addWidget(MatrixD, 4,1)
         #grid.addWidget(self.radio1,1, 2)
         #grid.addWidget(self.radio2, 2,2)
         grid.addWidget(self.checkBox, 4,1)
-        grid.addWidget(Run, 4,3)
+        grid.addWidget(Run, 4,2)
+        grid.addWidget(self.progressBar,5,2)
         #mainLayout.addWidget(Run)
         #mainLayout.addWidget(example1)
         #mainLayout.addWidget(example2)
@@ -201,30 +208,38 @@ class InputTab(QtGui.QWidget):
 
     def onRun(self):
         global OUTPUT,on_example
-        #include tests
+        
         on_example=False # in order to prevent erasing matrices with old ones
-        if self.checkBox.isChecked():
-            do_test=True
-        else:
-            do_test=False
-        
-        if self.radio1.isChecked():
-                OUTPUT=ALGO4(As,Bs,Cs,Ds,do_test)
-        elif self.radio2.isChecked():
-                OUTPUT=ALGO11(As,Bs,Cs,Ds,do_test)
-        elif self.radio3.isChecked():
-                OUTPUT=ALGO21(As,Bs,Cs,Ds,do_test)
-        elif self.radio4.isChecked():
-                OUTPUT=ALGO24(As,Bs,Cs,Ds,do_test)
-            
-
-        
-        else:
+        self.progressBar.reset()
+        if check_input(As,Bs,Cs,Ds)==False:
             msgBox = QtGui.QMessageBox()
             msgBox.setWindowTitle(self.tr("polynomial2gss"))
             msgBox.setText("<b> Your input doesn't meet the problem requirements <\b>")
             msgBox.exec_()
+        else:        
+            if self.checkBox.isChecked():
+                do_test=True
+            else:
+                do_test=False
         
+
+            
+            self.progressBar.setValue(0.1)
+            if self.radio1.isChecked():
+                OUTPUT=ALGO4(As,Bs,Cs,Ds,do_test)
+            elif self.radio2.isChecked():
+                OUTPUT=ALGO11(As,Bs,Cs,Ds,do_test)
+            elif self.radio3.isChecked():
+                OUTPUT=ALGO21(As,Bs,Cs,Ds,do_test)
+            elif self.radio4.isChecked():
+                OUTPUT=ALGO24(As,Bs,Cs,Ds,do_test)
+            self.progressBar.setValue(1.0)
+            
+   
+
+        
+        
+
     def example1(self):
         global As,Bs,Cs,Ds, on_example
         on_example=True
@@ -233,6 +248,10 @@ class InputTab(QtGui.QWidget):
         Bs=Matrix([[s**2+1],[s**3+2*s**2+s+3]]);
         Cs=Matrix([[-s**2-3*s-1,-s**4 -4*s**3-4*s**2+1]]);
         Ds=Matrix([[s**3+2*s**2 +s +2]]);
+        msgBox = QtGui.QMessageBox()                                
+        msgBox.setWindowTitle(self.tr("polynomial2gss"))
+        msgBox.setText("<b> Push the Matrix Buttons to see the input matrices<\b>")
+        msgBox.exec_()
     
     def example2(self):
         global As,Bs,Cs,Ds, on_example
@@ -242,7 +261,23 @@ class InputTab(QtGui.QWidget):
         Bs=Matrix([[s+1],[s**5+2*s**2+s+3]]); # to 5 htan 3
         Cs=Matrix([[-s**2-3*s-1,1]]);
         Ds=Matrix([[s**3 +s +2]]);
-       
+        msgBox = QtGui.QMessageBox()                                
+        msgBox.setWindowTitle(self.tr("polynomial2gss"))
+        msgBox.setText("<b> Push the Matrix Buttons to see the input matrices<\b>")
+        msgBox.exec_()
+        
+    def example3(self):
+        global As,Bs,Cs,Ds, on_example
+        on_example=True
+        s=symbols('s')
+        As=Matrix(3,3,[s**4+s**3+1,s+3,s**3+2,s**2+2,s**3+2,s**4+3,s**4+2,s**2+1,s-2])
+        Bs=Matrix(3,2,[s**4+2,s-2,s**3+1,s-3,s**4+s**2+s+1,s**3+1])
+        Cs=Matrix(1,3,[s**4+2,s**3+s+1,s**2+s+2])
+        Ds=Matrix(1,2,[s**3+2,s**2+s+4])
+        msgBox = QtGui.QMessageBox()                                
+        msgBox.setWindowTitle(self.tr("polynomial2gss"))
+        msgBox.setText("<b> Push the Matrix Buttons to see the input matrices<\b>")
+        msgBox.exec_()
        
        
 
@@ -405,20 +440,9 @@ class Input_Dialog(QtGui.QDialog):
         self.tableWidget.setColumnCount(2)
         self.tableWidget.setRowCount(2)
 
-        if on_example==True:  # fill matrices with the example values
-            self.fill()
+        self.fill()
         
-        if self.Name_of_Matrix=='A' and already_entered_A==True:
-            self.fill()
-        if self.Name_of_Matrix=='B' and already_entered_B==True:
-            self.fill()
-        if self.Name_of_Matrix=='C' and already_entered_C==True:
-            self.fill()
-        if self.Name_of_Matrix=='D' and already_entered_D==True:
-            self.fill()
-
-
-
+        
         #Create Buttons 
         AddRowButton = QtGui.QPushButton(self.tr("Add Row"))
         RemoveRowButton=QtGui.QPushButton(self.tr("Remove Last Row"))
@@ -482,23 +506,23 @@ class Input_Dialog(QtGui.QDialog):
         data=[sympify(self.tableWidget.item(i,j).text()) for i,j in  product(range(self.tableWidget.rowCount()), range(self.tableWidget.columnCount()))]
         
         if self.Name_of_Matrix=='A':
-            global As,already_entered_A
+            global As,already_entered
             As=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data)
-            already_entered_A=True
+            already_entered['A']=True
             
         elif self.Name_of_Matrix=='B':
-            global Bs ,already_entered_B
+            global Bs ,already_entered
             Bs=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data) 
-            already_entered_B=True
+            already_entered['B']=True
             
         elif self.Name_of_Matrix=='C':
-            global Cs,already_entered_C
+            global Cs,already_entered
             Cs=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data) 
-            already_entered_C=True
+            already_entered['C']=True
         else:
-            global Ds ,already_entered_D
+            global Ds ,already_entered
             Ds=Matrix(self.tableWidget.rowCount(),self.tableWidget.columnCount(),data) 
-            already_entered_D=True
+            already_entered['D']=True
         
         
         self.close()        #close input window
@@ -516,10 +540,9 @@ class Input_Dialog(QtGui.QDialog):
 
         self.tableWidget.setColumnCount(M.cols)
         self.tableWidget.setRowCount(M.rows)
-        for i in range(M.rows):
-            for j in range(M.cols):
-                item = QtGui.QTableWidgetItem(str(M[i,j]).replace('**','^'))  #sympy uses ** for exponents
-                self.tableWidget.setItem(i, j, item)
+        for i,j in product(range(M.rows),range(M.cols)):
+            item = QtGui.QTableWidgetItem(str(M[i,j]).replace('**','^'))  #sympy uses ** for exponents
+            self.tableWidget.setItem(i, j, item)
         
 
 
