@@ -3,14 +3,18 @@ Implementation of algorithms for the reduction of a polynomial-matrix model of a
 
 Implementation of algorithms shown in http://imamci.oxfordjournals.org/content/17/1/1.abstract in python 3 using the Qt Library
 
-## Title
+## The following methods have been implemented:
 
-bla bla
+- Wolovich Equivalent Model
+- Bosgra & Van Den Weiden Equivalent Model
+- Tan & Vandewall  Equivalent Model 
+- Tan & Vandewall  Equivalent Model (alternative algorithm)
 
-- item1
-- item2
+##Running the program
+- To run the programm download dist.zip, extract it and run  launch_GUI.exe 
 
-## Required Packages:
+## Compiling the code 
+#Required Packages:
 In order to compile the program you need Python 3 and the following python packages:
 
 - Sympy http://sympy.org/en/index.html
