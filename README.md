@@ -11,10 +11,12 @@ Implementation of algorithms shown in http://imamci.oxfordjournals.org/content/1
 - Tan & Vandewall  Equivalent Model (alternative algorithm)
 
 ##Running the program
-- To run the programm download dist.zip, extract it and run  launch_GUI.exe 
+- To run the programm download  <a href="https://github.com/ChristosT/polynomial2gss/blob/master/dist.zip">dist.zip</a>
+
+dist.zip, extract it and run  launch_GUI.exe 
 
 ## Compiling the code 
-#Required Packages:
+###Required Packages:
 In order to compile the program you need Python 3 and the following python packages:
 
 - Sympy http://sympy.org/en/index.html
