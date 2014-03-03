@@ -1,5 +1,9 @@
-from sympy import *
-import numpy as np
+#from sympy import *
+from sympy.core.symbol import symbols
+from sympy.matrices import Matrix, eye, zeros
+from sympy.matrices.expressions.blockmatrix import BlockDiagMatrix ,BlockMatrix
+from sympy.simplify.simplify import simplify
+from  numpy import mat, ix_
 
 import matrix_coefficients as mc
 s=symbols('s')
@@ -46,10 +50,10 @@ def ALGO11(As,Bs,Cs,Ds,do_test):
     J=PiE.rref()[1]                 #pivot columns
     I=(PiE.transpose()).rref()[1]   #pivot rows
     
-    PE=Matrix(np.mat(PiE)[np.ix_(I,J)])
-    PA=Matrix(np.mat(PiA)[np.ix_(I,J)])
-    PB=Matrix(np.mat(PiB)[np.ix_(I,range(l))])
-    PC=Matrix(np.mat(PiC)[np.ix_(range(k),J)])
+    PE=Matrix(mat(PiE)[ix_(I,J)])     #mat and ix are Numpy functions
+    PA=Matrix(mat(PiA)[ix_(I,J)])
+    PB=Matrix(mat(PiB)[ix_(I,range(l))])
+    PC=Matrix(mat(PiC)[ix_(range(k),J)])
     #===================END=STEP 3======================================
     #=======================STEP 4======================================
     Lambda=r+rE +p +m
@@ -77,7 +81,6 @@ def test(rE,r,p,m,PE,PA,PC,As,Bs,Cs,Ds,E,A,B,C,D):
     D1Block4=BlockMatrix([[zeros(r,p)],[eye(p)]]).as_mutable()
     D1=BlockMatrix([[eye(r+p),D1Block2,D1Block3,D1Block4]]).as_mutable()
     D2=BlockMatrix(2,2,[s*E-A,B,-C,D]).as_mutable()
-
     D3=BlockMatrix(2,2,[As,Bs,-Cs,Ds]).as_mutable()
     D4=BlockMatrix([[eye(r),zeros(r,rE+2*p),zeros(r,m)],
                     [zeros(m,r),zeros(m,rE+2*p),eye(m)]]).as_mutable()
