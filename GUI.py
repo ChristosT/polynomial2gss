@@ -10,7 +10,7 @@ from matplotlib import rc
 from itertools import product
 
 
-from sympy import Matrix, Poly, symbols, pprint, zeros,sympify
+from sympy import Matrix, Poly, symbols, zeros,sympify
 #from matplotlibwidget import MatplotlibWidget
 from check import check_input
 from ALGO4 import ALGO4
@@ -39,12 +39,15 @@ class MainWindow(QtGui.QDialog):
         tabWidget.addTab(OutputTab(), self.tr("Output"))
        
         QuitButton=  QtGui.QPushButton(self.tr("Quit"))
+        AboutButton=  QtGui.QPushButton(self.tr("About"))
    
         QuitButton.clicked.connect( self, QtCore.SLOT("close()"))
+        AboutButton.clicked.connect( self.onAbout)
         #self.pushButton.clicked.connect(self.on_button_clicked) 
         #self.connect(cancelButton, QtCore.SIGNAL("clicked()"), self, QtCore.SLOT("reject()"))
 
         buttonLayout = QtGui.QHBoxLayout()
+        buttonLayout.addWidget(AboutButton)
         buttonLayout.addStretch(1)
         buttonLayout.addWidget(QuitButton)
         #buttonLayout.addWidget(cancelButton)
@@ -55,8 +58,39 @@ class MainWindow(QtGui.QDialog):
         self.setLayout(mainLayout)
 
         self.setWindowTitle(self.tr("polynomial2gss"))
+        
+    def onAbout(self):
+        
+        self.dialog = About_Dialog('A')
+        self.dialog.exec_()
     
-             
+        
+        
+        
+        
+class About_Dialog(QtGui.QDialog):
+    def __init__(self,parent=None):
+        QtGui.QDialog.__init__(self)
+        self.Label = QtGui.QLabel(self)
+        #http://www.daniweb.com/software-development/python/code/447295/exploring-the-pyside-label
+        text= """\
+        <font size=5>
+        <center>
+        <p>© 2014 Christos Tsolakis</p>
+        <p>polynomial2gss</p>
+        <p>For the latest vesion or <br> the source code check:</p>
+        <p><a href="https://github.com/ChristosT/polynomial2gss">Project's GitHub site</a> </p>
+        </center>
+        </font>
+        """
+        self.Label.setOpenExternalLinks(1) #http://qt-project.org/doc/qt-4.8/qlabel.html#openExternalLinks-prop
+        self.Label.setAlignment(QtCore.Qt.AlignVCenter)
+        self.Label.setText(text)
+        self.resize(250,200)
+        self.setWindowTitle('About')
+       
+       
+                    
 class InputTab(QtGui.QWidget):
     def __init__(self,parent=None):
     
@@ -380,7 +414,7 @@ class OutputTab(QtGui.QWidget):
             
             msgBox = QtGui.QMessageBox()
             msgBox.setWindowTitle(self.tr("polynomial2gss"))
-            msgBox.setText("Are the results fullfil the Furhmann system-equivalence ? :" )
+            msgBox.setText("Are the results fullfil the Fuhrmann system-equivalence ? :" )
             msgBox.setInformativeText(text)
             msgBox.exec_()
 
